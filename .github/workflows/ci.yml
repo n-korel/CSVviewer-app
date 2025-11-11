@@ -93,23 +93,26 @@ jobs:
       - name: Build and start services
         run: docker compose up -d --build
 
-      - name: Wait for services to be ready
+      - name: Wait for backend to be ready
         run: |
           echo "Waiting for backend to be ready..."
           timeout 60 bash -c 'until curl -f http://localhost:8080/api/data?page=1&per_page=1; do sleep 2; done'
           echo "Backend is ready!"
 
+      - name: Wait for frontend to be ready
+        run: |
           echo "Waiting for frontend to be ready..."
           timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
           echo "Frontend is ready!"
 
-      - name: Run backend tests in container
+      - name: Run backend tests locally
         run: |
-          docker compose exec -T backend go test ./... -v
+          echo "Running Go unit tests..."
+          go test ./... -v
 
       - name: Test API endpoints
         run: |
-          # Test health/data endpoint (should return empty data)
+          echo "Testing API endpoints..."
           curl -f http://localhost:8080/api/data?page=1&per_page=10 || exit 1
           echo "✓ API is responding"
 
