@@ -25,59 +25,73 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-10 text-center">
-          <h1 className="text-5xl font-bold text-gray-800 mb-2">CSV Viewer</h1>
-          <p className="text-gray-600 text-lg">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            CSV Viewer
+          </h1>
+          <p className="mt-2 text-lg text-gray-600">
             Загружайте и анализируйте большие CSV файлы
           </p>
         </header>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <section className="mb-6 rounded-lg bg-white p-6 shadow">
           <FileUpload
             onUploadSuccess={handleUploadSuccess}
             setIsLoading={setIsLoading}
           />
-        </div>
+        </section>
 
         {data && (
           <>
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
+            <section className="mb-6 rounded-lg bg-white p-6 shadow">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold text-gray-800">
+                  <h2 className="text-2xl font-semibold text-gray-900">
                     Данные загружены
                   </h2>
-                  <p className="text-gray-600 mt-1">
-                    Всего записей: {data.row_count?.toLocaleString()}
+                  <p className="mt-1 text-sm text-gray-600">
+                    Всего записей:{" "}
+                    <span className="font-medium">
+                      {data.row_count?.toLocaleString()}
+                    </span>
                   </p>
                 </div>
                 <button
                   onClick={handleClear}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                  className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  type="button"
                 >
                   Очистить данные
                 </button>
               </div>
 
-              <SearchBar
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
-            </div>
+              <div className="mt-6">
+                <SearchBar
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                />
+              </div>
+            </section>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <section className="rounded-lg bg-white p-6 shadow">
               <DataTable headers={data.headers} searchQuery={searchQuery} />
-            </div>
+            </section>
           </>
         )}
 
         {isLoading && (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-gray-600">Загрузка файла...</p>
-          </div>
+          <section className="rounded-lg bg-white p-12 text-center shadow">
+            <div
+              className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"
+              role="status"
+            >
+              <span className="sr-only">Загрузка...</span>
+            </div>
+            <p className="mt-4 text-gray-600">Загрузка файла...</p>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }
