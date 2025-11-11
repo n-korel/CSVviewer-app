@@ -29,8 +29,17 @@ func main() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	// CORS
+	allowedOrigins := []string{
+		"http://localhost:3000",
+		"http://localhost:5173",
+	}
+
+	if origin := os.Getenv("CORS_ORIGIN"); origin != "" {
+		allowedOrigins = append(allowedOrigins, origin)
+	}
+
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173"},
+		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Content-Type"},
 		AllowCredentials: false,
