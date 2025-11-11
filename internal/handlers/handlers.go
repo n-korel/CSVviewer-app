@@ -21,7 +21,7 @@ func NewHandler(s storage.Storage) *Handler {
 
 // Обработка загрузки CSV файла
 func (h *Handler) UploadCSV(w http.ResponseWriter, r *http.Request) {
-	const maxUploadSize = 10 << 20 // 10 MB
+ 	const maxUploadSize = 10 << 20 // 10 MB
 	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
     if err := r.ParseMultipartForm(10 << 20); err != nil {
         respondError(w, "file too large", http.StatusRequestEntityTooLarge)
