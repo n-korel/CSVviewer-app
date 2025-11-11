@@ -22,7 +22,11 @@ func TestUploadCSV(t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.csv")
-	io.WriteString(part, csvContent)
+
+	if _, err := io.WriteString(part, csvContent); err != nil {
+		t.Fatalf("WriteString() error = %v", err)
+	}
+
 	writer.Close()
 
 	req := httptest.NewRequest("POST", "/api/upload", body)
@@ -35,8 +39,11 @@ func TestUploadCSV(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var response map[string]interface{}
-	json.NewDecoder(w.Body).Decode(&response)
+	var response map[string]any
+
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Decode() error = %v", err)
+	}
 
 	if response["row_count"].(float64) != 2 {
 		t.Errorf("Expected 2 rows, got %v", response["row_count"])
@@ -60,8 +67,11 @@ func TestGetData(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var response map[string]interface{}
-	json.NewDecoder(w.Body).Decode(&response)
+	var response map[string]any
+
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Decode() error = %v", err)
+	}
 
 	if response["total"].(float64) != 2 {
 		t.Errorf("Expected total 2, got %v", response["total"])
@@ -85,8 +95,11 @@ func TestSearchData(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var response map[string]interface{}
-	json.NewDecoder(w.Body).Decode(&response)
+	var response map[string]any
+
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("Decode() error = %v", err)
+	}
 
 	if response["total"].(float64) != 1 {
 		t.Errorf("Expected 1 search result, got %v", response["total"])
@@ -122,7 +135,9 @@ func uploadCSV(handler *Handler, csvContent string) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", "test.csv")
+
 	io.WriteString(part, csvContent)
+
 	writer.Close()
 
 	req := httptest.NewRequest("POST", "/api/upload", body)

@@ -21,12 +21,12 @@ func NewHandler(s storage.Storage) *Handler {
 
 // Обработка загрузки CSV файла
 func (h *Handler) UploadCSV(w http.ResponseWriter, r *http.Request) {
- 	const maxUploadSize = 10 << 20 // 10 MB
+	const maxUploadSize = 10 << 20 // 10 MB
 	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
-    if err := r.ParseMultipartForm(10 << 20); err != nil {
-        respondError(w, "file too large", http.StatusRequestEntityTooLarge)
-    return
-    }
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		respondError(w, "file too large", http.StatusRequestEntityTooLarge)
+		return
+	}
 
 	file, _, err := r.FormFile("file")
 	if err != nil {
@@ -45,7 +45,7 @@ func (h *Handler) UploadCSV(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var rows []map[string]interface{}
+	var rows []map[string]any
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
@@ -55,7 +55,7 @@ func (h *Handler) UploadCSV(w http.ResponseWriter, r *http.Request) {
 			continue // пропускаем ошибочные строки
 		}
 
-		row := make(map[string]interface{})
+		row := make(map[string]any)
 		for i, value := range record {
 			if i < len(headers) {
 				row[headers[i]] = value
@@ -144,12 +144,12 @@ func (h *Handler) ClearData(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, map[string]string{"message": "Data cleared successfully"}, http.StatusOK)
 }
 
-func respondJSON(w http.ResponseWriter, data interface{}, status int) {
+func respondJSON(w http.ResponseWriter, data any, status int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-    if err := json.NewEncoder(w).Encode(data); err != nil {
-        http.Error(w, "encoding error", http.StatusInternalServerError)
-    }
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		http.Error(w, "encoding error", http.StatusInternalServerError)
+	}
 }
 
 func respondError(w http.ResponseWriter, message string, status int) {

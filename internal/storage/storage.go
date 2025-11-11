@@ -78,7 +78,7 @@ func (s *MemoryStorage) Search(query string, page, perPage int) (*models.Paginat
 	defer s.mu.RUnlock()
 
 	query = strings.ToLower(query)
-	var filtered []map[string]interface{}
+	var filtered []map[string]any
 
 	for _, row := range s.data.Rows {
 		for _, value := range row {

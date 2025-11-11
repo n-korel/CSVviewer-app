@@ -10,7 +10,7 @@ func TestMemoryStorage_Store(t *testing.T) {
 	store := NewMemoryStorage()
 	data := &models.CSVData{
 		Headers: []string{"Name", "Age"},
-		Rows: []map[string]interface{}{
+		Rows: []map[string]any{
 			{"Name": "John", "Age": "30"},
 			{"Name": "Jane", "Age": "25"},
 		},
@@ -36,15 +36,17 @@ func TestMemoryStorage_GetPaginated(t *testing.T) {
 	store := NewMemoryStorage()
 	data := &models.CSVData{
 		Headers: []string{"ID"},
-		Rows:    make([]map[string]interface{}, 100),
+		Rows:    make([]map[string]any, 100),
 		Total:   100,
 	}
 
 	for i := 0; i < 100; i++ {
-		data.Rows[i] = map[string]interface{}{"ID": i}
+		data.Rows[i] = map[string]any{"ID": i}
 	}
 
-	store.Store(data)
+	if err := store.Store(data); err != nil {
+		t.Fatalf("Store() error = %v", err)
+	}
 
 	// Тест первой страницы
 	result, err := store.GetPaginated(1, 10)
@@ -75,7 +77,7 @@ func TestMemoryStorage_Search(t *testing.T) {
 	store := NewMemoryStorage()
 	data := &models.CSVData{
 		Headers: []string{"Name", "City"},
-		Rows: []map[string]interface{}{
+		Rows: []map[string]any{
 			{"Name": "John", "City": "New York"},
 			{"Name": "Jane", "City": "London"},
 			{"Name": "Bob", "City": "New York"},
@@ -83,7 +85,9 @@ func TestMemoryStorage_Search(t *testing.T) {
 		Total: 3,
 	}
 
-	store.Store(data)
+	if err := store.Store(data); err != nil {
+		t.Fatalf("Store() error = %v", err)
+	}
 
 	// Поиск по "New York"
 	result, err := store.Search("New York", 1, 10)
@@ -120,12 +124,17 @@ func TestMemoryStorage_Clear(t *testing.T) {
 	store := NewMemoryStorage()
 	data := &models.CSVData{
 		Headers: []string{"Name"},
-		Rows:    []map[string]interface{}{{"Name": "John"}},
+		Rows:    []map[string]any{{"Name": "John"}},
 		Total:   1,
 	}
 
-	store.Store(data)
-	store.Clear()
+	if err := store.Store(data); err != nil {
+		t.Fatalf("Store() error = %v", err)
+	}
+
+	if err := store.Clear(); err != nil {
+		t.Fatalf("Clear() error = %v", err)
+	}
 
 	retrieved, _ := store.GetAll()
 	if len(retrieved.Rows) != 0 {
