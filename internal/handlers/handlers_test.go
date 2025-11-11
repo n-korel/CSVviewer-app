@@ -56,7 +56,7 @@ func TestGetData(t *testing.T) {
 
 	// Предзагружаем данные
 	csvContent := "Name,Age\nJohn,30\nJane,25\n"
-	uploadCSV(handler, csvContent)
+	uploadCSV(handler, csvContent, t)
 
 	req := httptest.NewRequest("GET", "/api/data?page=1&per_page=10", nil)
 	w := httptest.NewRecorder()
@@ -84,7 +84,7 @@ func TestSearchData(t *testing.T) {
 
 	// Предзагружаем данные
 	csvContent := "Name,Age\nJohn,30\nJane,25\n"
-	uploadCSV(handler, csvContent)
+	uploadCSV(handler, csvContent, t)
 
 	req := httptest.NewRequest("GET", "/api/search?q=John&page=1&per_page=10", nil)
 	w := httptest.NewRecorder()
@@ -112,7 +112,7 @@ func TestClearData(t *testing.T) {
 
 	// Предзагружаем данные
 	csvContent := "Name,Age\nJohn,30\n"
-	uploadCSV(handler, csvContent)
+	uploadCSV(handler, csvContent, t)
 
 	req := httptest.NewRequest("DELETE", "/api/clear", nil)
 	w := httptest.NewRecorder()
@@ -131,14 +131,22 @@ func TestClearData(t *testing.T) {
 }
 
 // Функция для загрузки CSV в тестах
-func uploadCSV(handler *Handler, csvContent string) {
+func uploadCSV(handler *Handler, csvContent string, t *testing.T) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, _ := writer.CreateFormFile("file", "test.csv")
 
-	io.WriteString(part, csvContent)
+	part, err := writer.CreateFormFile("file", "test.csv")
+	if err != nil {
+		t.Fatalf("CreateFormFile() error: %v", err)
+	}
 
-	writer.Close()
+	if _, err := io.WriteString(part, csvContent); err != nil {
+		t.Fatalf("WriteString() error: %v", err)
+	}
+
+	if err := writer.Close(); err != nil {
+		t.Fatalf("Writer.Close() error: %v", err)
+	}
 
 	req := httptest.NewRequest("POST", "/api/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())

@@ -91,7 +91,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and start services
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
 
       - name: Wait for services to be ready
         run: |
@@ -105,7 +105,7 @@ jobs:
 
       - name: Run backend tests in container
         run: |
-          docker-compose exec -T backend go test ./... -v
+          docker compose exec -T backend go test ./... -v
 
       - name: Test API endpoints
         run: |
@@ -117,13 +117,13 @@ jobs:
         if: failure()
         run: |
           echo "=== Backend logs ==="
-          docker-compose logs backend
+          docker compose logs backend
           echo "=== Frontend logs ==="
-          docker-compose logs frontend
+          docker compose logs frontend
 
       - name: Cleanup
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
 
   build-check:
     name: Build Check
